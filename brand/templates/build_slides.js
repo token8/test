@@ -9,10 +9,10 @@ const M = 0.6; // outer margin (inches)
 
 const pres = new pptxgen();
 pres.layout = "LAYOUT_16x9"; // 10 x 5.625 in
-pres.title = "Brand Slides Template v0.1";
+pres.title = "Brand Slides Template v0.2";
 pres.theme = { headFontFace: H, bodyFontFace: B };
 
-const footer = (color) => ({ text: { text: "BRAND · v0.1", options: {
+const footer = (color) => ({ text: { text: "BRAND · v0.2", options: {
   x: M, y: 5.1, w: 3, h: 0.3, margin: 0, fontFace: H, fontSize: 9, charSpacing: 2, color } } });
 
 pres.defineSlideMaster({ title: "Title", background: { color: C.ink }, objects: [
@@ -58,7 +58,7 @@ txt(s, [
   { text: "Accent colour for the one thing that matters", options: { bullet: true } },
 ], { x: M, y: 1.5, w: 5.2, h: 2.6, fontSize: 16, paraSpaceAfter: 10 });
 s.addShape(pres.shapes.RECTANGLE, { x: 6.3, y: 1.5, w: 3.1, h: 1.9, fill: { color: "F4F4F4" } });
-txt(s, "NOTE", { x: 6.55, y: 1.75, w: 2.6, h: 0.3, fontFace: H, fontSize: 11, charSpacing: 3, color: C.accent });
+txt(s, "NOTE", { x: 6.55, y: 1.75, w: 2.6, h: 0.3, fontFace: H, fontSize: 11, charSpacing: 3, color: C.accent_text });
 txt(s, "Use a tinted panel — not a stripe — to set supporting information apart.",
   { x: 6.55, y: 2.1, w: 2.6, h: 1.2, fontSize: 13, color: C.muted });
 
@@ -94,12 +94,11 @@ txt(s, "JOST — SECTION LABELS", { x: M, y: 2.1, w: 5, h: 0.4, fontFace: H, fon
 txt(s, "Nunito Sans — body text for slides, documents and diagram labels. Readable at small sizes.",
   { x: M, y: 2.6, w: 4.8, h: 0.8, fontSize: 14 });
 txt(s, "Master tier (print / licensed): Futura PT + Avenir Next", { x: M, y: 3.6, w: 4.8, h: 0.4, fontSize: 11, color: C.muted });
-[["ink", C.ink], ["accent*", C.accent], ["muted", C.muted], ["line", C.line]].forEach(([n, c], i) => {
-  const y = 1.55 + i * 0.75;
-  s.addShape(pres.shapes.RECTANGLE, { x: 6.4, y, w: 0.55, h: 0.55, fill: { color: c }, line: { color: C.line, width: 0.75 } });
-  txt(s, `${n}  #${c}`, { x: 7.1, y: y + 0.13, w: 2.3, h: 0.3, fontFace: H, fontSize: 12 });
+[["ink", C.ink], ["accent", C.accent], ["accent text", C.accent_text], ["muted", C.muted], ["line", C.line]].forEach(([n, c], i) => {
+  const y = 1.45 + i * 0.68;
+  s.addShape(pres.shapes.RECTANGLE, { x: 6.4, y, w: 0.5, h: 0.5, fill: { color: c }, line: { color: C.line, width: 0.75 } });
+  txt(s, `${n}  #${c}`, { x: 7.05, y: y + 0.1, w: 2.3, h: 0.3, fontFace: H, fontSize: 12 });
 });
-txt(s, "* provisional", { x: 7.1, y: 4.6, w: 2.3, h: 0.3, fontSize: 10, color: C.muted });
 
 // 7 — Closing
 s = pres.addSlide({ masterName: "Title" });

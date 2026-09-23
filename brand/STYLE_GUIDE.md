@@ -1,4 +1,4 @@
-# Brand Style Guide — v0.1 (draft)
+# Brand Style Guide — v0.2 (draft)
 
 > Status: **developing**. This guide starts small and gets extended as decisions
 > are made. Anything marked *provisional* has not been decided yet.
@@ -53,14 +53,14 @@ PowerPoint, Word and Google Workspace. Medium/SemiBold weights may not.
 | Title | Jost | Bold | 26 pt |
 | Heading 1 | Jost | Bold | 18 pt |
 | Heading 2 | Jost | Bold | 14 pt |
+| Heading 3 | Jost, `accent_text` colour | Bold | 11 pt |
 | Normal text | Nunito Sans | Regular | 11 pt, line spacing 1.3 |
 | Caption | Nunito Sans | Regular | 9 pt |
 
-## 2. Colour — draft
+## 2. Colour
 
-Neutral base plus **one** accent. The accent is *provisional* until a brand colour
-is chosen. Changing it means updating `tokens.json` and the theme colours of the
-templates.
+Neutral base plus **one** accent: a warm vermilion that echoes the geometric,
+Bauhaus-era roots of Futura. Use it sparingly — roughly 10 % of any page or slide.
 
 | Token | Hex | Use |
 |---|---|---|
@@ -68,7 +68,13 @@ templates.
 | `paper` | `#FFFFFF` | Backgrounds |
 | `muted` | `#6B6B6B` | Captions, secondary text |
 | `line` | `#E3E3E3` | Rules, table borders |
-| `accent` | `#E4572E` *(provisional)* | Title-slide mark, section slides, key numbers, the one highlighted diagram element |
+| `accent` | `#E4572E` | Brand colour: title-slide mark, section slides, big numbers, the one highlighted diagram element |
+| `accent_text` | `#C4421D` | Small accent text on white (labels, links, doc sub-headings) |
+
+**Contrast rule.** `accent` on white is 3.7 : 1 — fine for shapes and large text
+(≥ 18 pt bold or ≥ 24 pt), too light for small text. For anything smaller use
+`accent_text` (5.1 : 1, meets WCAG AA). White text on an `accent` background
+only at ≥ 18 pt bold; `ink` on `accent` works at any size (4.7 : 1).
 
 ## 3. Layout principles (starting set)
 
@@ -86,8 +92,8 @@ templates.
 1. New presentation → *Slide → Edit theme*.
 2. Font menu → *More fonts* → add **Jost** and **Nunito Sans**.
 3. Set the Title placeholder to Jost Bold, body placeholders to Nunito Sans.
-4. *Theme colours* → enter the palette above.
-5. Rename the theme (e.g. "Brand v0.1"), save the file as `TEMPLATE – Slides`.
+4. *Theme colours* → Accent 1 `#E4572E`, Dark 1 `#1A1A1A`, Light 1 `#FFFFFF`.
+5. Rename the theme (e.g. "Brand v0.2"), save the file as `TEMPLATE – Slides`.
    New decks: *File → Make a copy*, or *Slide → Change theme → Import theme*.
 
 **Google Docs — set default styles**
@@ -119,4 +125,5 @@ Font License: free for any use, including commercial and embedding.
 
 ## Changelog
 
+- **v0.2** — Accent `#E4572E` confirmed as brand colour; added `accent_text` and contrast rule.
 - **v0.1** — Typography tiers, type scales, provisional accent, Workspace setup, Slides + Docs templates.

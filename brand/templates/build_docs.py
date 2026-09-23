@@ -40,7 +40,7 @@ style("Title", H, 26, bold=True, after=4, line=1.1)
 style("Subtitle", B, 13, color="muted", after=18)
 style("Heading 1", H, 18, bold=True, before=20, after=6, line=1.1)
 style("Heading 2", H, 14, bold=True, before=14, after=4, line=1.1)
-style("Heading 3", H, 11, bold=True, color="accent", before=10, after=2, line=1.1)
+style("Heading 3", H, 11, bold=True, color="accent_text", before=10, after=2, line=1.1)
 style("Caption", B, 9, color="muted")
 style("Quote", B, 11, color="muted")
 style("List Bullet", B, 11, after=3)
@@ -58,7 +58,7 @@ def add_inline(par, text, bold=False):
         if part.startswith("**"):
             r = par.add_run(part[2:-2]); r.bold = True
         elif part.startswith("`"):
-            r = par.add_run(part[1:-1]); r.font.color.rgb = C["accent"]
+            r = par.add_run(part[1:-1]); r.font.color.rgb = C["accent_text"]
         elif part.startswith("["):
             r = par.add_run(re.match(r"\[([^\]]+)\]", part).group(1))
         elif part.startswith("*"):
