@@ -1,7 +1,7 @@
 # Brand Style Guide — v0.1 (draft)
 
 > Status: **developing**. This guide starts small and gets extended as decisions
-> are made. Anything marked `TBD` has not been decided yet.
+> are made. Anything marked *provisional* has not been decided yet.
 
 ## 1. Typography
 
@@ -18,7 +18,7 @@ the text silently falls back to a default (usually Arial) and layouts shift.
 | Tier | Where | Headline | Body |
 |---|---|---|---|
 | **Master** (licensed) | Keynote, PowerPoint, Word, InDesign, Figma, PDF exports made on a Mac with the fonts | **Futura PT** / Futura (Medium, Bold) | **Avenir Next** (Regular, Medium, Demi) |
-| **Workspace** (free, Google Fonts) | Google Slides, Docs, Sheets, Drawings, web, diagrams | **Jost** (500, 600, 700) | **Nunito Sans** (400, 600, 700) |
+| **Workspace** (free, Google Fonts) | Google Slides, Docs, Sheets, Drawings, web, diagrams | **Jost** (Regular, Bold) | **Nunito Sans** (Regular, Bold) |
 
 - **Jost** is an open-source typeface explicitly modelled on Futura.
 - **Nunito Sans** is the closest free match to Avenir's humanist-geometric feel
@@ -29,6 +29,9 @@ the Workspace tier from the start. Only the final, polished export (PDF) may be
 re-set in the Master tier — or simply stay in Jost/Nunito Sans. Consistency beats
 the original typeface.
 
+Stick to Regular and Bold: they carry over reliably when files move between
+PowerPoint, Word and Google Workspace. Medium/SemiBold weights may not.
+
 > Recommendation for a lean workflow: **use the Workspace tier as the default
 > everywhere.** Keep the Master tier for print and special occasions.
 
@@ -36,25 +39,28 @@ the original typeface.
 
 | Role | Font | Weight | Size | Case / tracking |
 |---|---|---|---|---|
-| Title | Jost | 600 | 40 pt | Sentence case, 0 |
-| Section header | Jost | 500 | 28 pt | UPPERCASE, +5 % letter spacing |
-| Subtitle | Nunito Sans | 400 | 20 pt | Sentence case |
-| Body | Nunito Sans | 400 | 16 pt | line spacing 1.3 |
-| Caption / source | Nunito Sans | 400 | 11 pt | muted colour |
+| Title | Jost | Bold | 40 pt | Sentence case |
+| Section label | Jost | Regular | 14 pt | UPPERCASE, wide letter spacing |
+| Slide headline | Jost | Bold | 28 pt | Sentence case |
+| Subtitle | Nunito Sans | Regular | 18 pt | Sentence case |
+| Body | Nunito Sans | Regular | 16 pt | line spacing 1.3 |
+| Caption / source | Nunito Sans | Regular | 11 pt | muted colour |
 
 ### Type scale (Docs, A4)
 
 | Role | Font | Weight | Size |
 |---|---|---|---|
-| Title | Jost | 600 | 26 pt |
-| Heading 1 | Jost | 600 | 18 pt |
-| Heading 2 | Jost | 500 | 14 pt |
-| Normal text | Nunito Sans | 400 | 11 pt, line spacing 1.3 |
-| Caption | Nunito Sans | 400 | 9 pt |
+| Title | Jost | Bold | 26 pt |
+| Heading 1 | Jost | Bold | 18 pt |
+| Heading 2 | Jost | Bold | 14 pt |
+| Normal text | Nunito Sans | Regular | 11 pt, line spacing 1.3 |
+| Caption | Nunito Sans | Regular | 9 pt |
 
-## 2. Colour — `TBD`
+## 2. Colour — draft
 
-Placeholder palette until brand colours are chosen. Keep it to one accent.
+Neutral base plus **one** accent. The accent is *provisional* until a brand colour
+is chosen. Changing it means updating `tokens.json` and the theme colours of the
+templates.
 
 | Token | Hex | Use |
 |---|---|---|
@@ -62,7 +68,7 @@ Placeholder palette until brand colours are chosen. Keep it to one accent.
 | `paper` | `#FFFFFF` | Backgrounds |
 | `muted` | `#6B6B6B` | Captions, secondary text |
 | `line` | `#E3E3E3` | Rules, table borders |
-| `accent` | `TBD` | One brand colour — highlights, key numbers |
+| `accent` | `#E4572E` *(provisional)* | Title-slide mark, section slides, key numbers, the one highlighted diagram element |
 
 ## 3. Layout principles (starting set)
 
@@ -76,14 +82,16 @@ Placeholder palette until brand colours are chosen. Keep it to one accent.
 ## 4. Setting it up in Google Workspace
 
 **Google Slides — create a master theme once**
+
 1. New presentation → *Slide → Edit theme*.
 2. Font menu → *More fonts* → add **Jost** and **Nunito Sans**.
-3. Set the Title placeholder to Jost 600, body placeholders to Nunito Sans.
+3. Set the Title placeholder to Jost Bold, body placeholders to Nunito Sans.
 4. *Theme colours* → enter the palette above.
 5. Rename the theme (e.g. "Brand v0.1"), save the file as `TEMPLATE – Slides`.
    New decks: *File → Make a copy*, or *Slide → Change theme → Import theme*.
 
 **Google Docs — set default styles**
+
 1. Format the Title / H1 / H2 / Normal text as in the table above.
 2. For each: *Format → Paragraph styles → [style] → Update to match*.
 3. *Options → Save as my default styles* — every new Doc now uses them.
@@ -95,7 +103,15 @@ Nunito Sans for labels; export as SVG/PNG and place into Slides/Docs.
 replace Futura → Jost and Avenir → Nunito Sans (PowerPoint: *Home → Replace →
 Replace Fonts*), then upload.
 
-## 5. Licensing note
+## 5. Templates
+
+| File | Use |
+|---|---|
+| `templates/brand-slides-template.pptx` | Upload to Drive, then open as Google Slides. Includes Title, Section and Content layouts plus example slides |
+| `templates/brand-docs-template.docx` | Upload to Drive, then open as Google Docs. Heading styles are pre-set and the file contains this guide |
+| `templates/build_slides.js`, `templates/build_docs.py` | Rebuild the templates from `tokens.json` after the guide changes |
+
+## 6. Licensing note
 
 Futura and Avenir Next ship with macOS, but that licence covers use on that Mac —
 not web embedding or redistribution. Jost and Nunito Sans are under the SIL Open
@@ -103,4 +119,4 @@ Font License: free for any use, including commercial and embedding.
 
 ## Changelog
 
-- **v0.1** — Typography tiers, type scales, placeholder palette, Workspace setup.
+- **v0.1** — Typography tiers, type scales, provisional accent, Workspace setup, Slides + Docs templates.
