@@ -9,10 +9,10 @@ const M = 0.6; // outer margin (inches)
 
 const pres = new pptxgen();
 pres.layout = "LAYOUT_16x9"; // 10 x 5.625 in
-pres.title = "Brand Slides Template v0.2";
+pres.title = "Brand Slides Template v0.3";
 pres.theme = { headFontFace: H, bodyFontFace: B };
 
-const footer = (color) => ({ text: { text: "BRAND · v0.2", options: {
+const footer = (color) => ({ text: { text: "BRAND · v0.3", options: {
   x: M, y: 5.1, w: 3, h: 0.3, margin: 0, fontFace: H, fontSize: 9, charSpacing: 2, color } } });
 
 pres.defineSlideMaster({ title: "Title", background: { color: C.ink }, objects: [
@@ -86,7 +86,31 @@ s.addText("Diagrams: flat shapes, thin lines, one accent", { placeholder: "title
 });
 txt(s, "Highlight only the step you are talking about.", { x: M, y: 3.6, w: 8, h: 0.4, fontSize: 13, color: C.muted });
 
-// 6 — Type & colour reference
+// 6 — Charts: grey + one accent
+s = pres.addSlide({ masterName: "Content" });
+s.addText("Charts: grey plus one accent tells the story", { placeholder: "title" });
+const quarters = ["Q1", "Q2", "Q3", "Q4", "Q5", "Q6"];
+const values = [42, 48, 45, 51, 68, 55];
+s.addChart(pres.charts.BAR, [{ name: "Revenue (k€)", labels: quarters, values }], {
+  x: M, y: 1.45, w: 5.6, h: 3.4, barDir: "col", barGapWidthPct: 60,
+  chartColors: values.map((_, i) => (i === 4 ? C.accent : t.chart.neutral_series.replace("#", ""))),
+  valAxisHidden: true, valGridLine: { style: "none" }, catGridLine: { style: "none" },
+  catAxisLabelColor: C.muted, catAxisLabelFontFace: B, catAxisLabelFontSize: 11,
+  catAxisLineShow: true, catAxisLineColor: t.chart.axis.replace("#", ""),
+  showValue: true, dataLabelPosition: "outEnd", dataLabelColor: C.ink, dataLabelFontFace: B, dataLabelFontSize: 11,
+  showLegend: false, showTitle: false,
+});
+txt(s, "WHY IT WORKS", { x: 6.55, y: 1.6, w: 2.9, h: 0.3, fontFace: H, fontSize: 11, charSpacing: 3, color: C.accent_text });
+txt(s, [
+  { text: "Headline states the finding", options: { bullet: true, breakLine: true } },
+  { text: "Only the bar that matters is in the accent", options: { bullet: true, breakLine: true } },
+  { text: "Values labelled, no gridlines, one axis", options: { bullet: true } },
+], { x: 6.55, y: 1.95, w: 2.9, h: 1.6, fontSize: 13, paraSpaceAfter: 6 });
+txt(s, "Series order when colour is needed:", { x: 6.55, y: 3.65, w: 2.9, h: 0.3, fontSize: 11, color: C.muted });
+t.chart.categorical.light.forEach((c, i) => s.addShape(pres.shapes.RECTANGLE,
+  { x: 6.55 + i * 0.4, y: 4.0, w: 0.3, h: 0.3, fill: { color: c.replace("#", "") } }));
+
+// 7 — Type & colour reference
 s = pres.addSlide({ masterName: "Content" });
 s.addText("Type & colour reference", { placeholder: "title" });
 txt(s, "Jost Bold — Headlines", { x: M, y: 1.5, w: 5, h: 0.5, fontFace: H, fontSize: 24, bold: true });
@@ -100,7 +124,7 @@ txt(s, "Master tier (print / licensed): Futura PT + Avenir Next", { x: M, y: 3.6
   txt(s, `${n}  #${c}`, { x: 7.05, y: y + 0.1, w: 2.3, h: 0.3, fontFace: H, fontSize: 12 });
 });
 
-// 7 — Closing
+// 8 — Closing
 s = pres.addSlide({ masterName: "Title" });
 s.addText("Thank you", { placeholder: "title" });
 s.addText("name@example.com · website", { placeholder: "subtitle" });

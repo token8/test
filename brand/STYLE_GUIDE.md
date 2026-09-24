@@ -1,4 +1,4 @@
-# Brand Style Guide — v0.2 (draft)
+# Brand Style Guide — v0.3 (draft)
 
 > Status: **developing**. This guide starts small and gets extended as decisions
 > are made. Anything marked *provisional* has not been decided yet.
@@ -76,7 +76,68 @@ Bauhaus-era roots of Futura. Use it sparingly — roughly 10 % of any page or sl
 `accent_text` (5.1 : 1, meets WCAG AA). White text on an `accent` background
 only at ≥ 18 pt bold; `ink` on `accent` works at any size (4.7 : 1).
 
-## 3. Layout principles (starting set)
+## 3. Charts & diagrams
+
+Charts use the same two typefaces and the same accent. Colours below were checked
+with a colour-vision-deficiency validator (adjacent series stay distinguishable
+for the common forms of colour blindness), in light and dark.
+
+### Highlight first, palette second
+
+Most charts should be **grey plus one accent**: the series or bar you are talking
+about in `accent`, everything else in `neutral_series` `#BDBDBD`. Reach for the
+full palette only when several series really need their own identity.
+
+### Series colours (categorical)
+
+Always assign in this order, never skip or shuffle. Slot 1 is the brand accent.
+
+| Slot | Light | Dark | Hue |
+|---|---|---|---|
+| 1 | `#E4572E` | `#E4572E` | vermilion (accent) |
+| 2 | `#2A78D6` | `#3987E5` | blue |
+| 3 | `#1BAF7A` | `#199E70` | aqua |
+| 4 | `#EDA100` | `#C98500` | ochre |
+| 5 | `#4A3AA7` | `#9085E9` | violet |
+| 6 | `#E87BA4` | `#D55181` | pink |
+| 7 | `#008300` | `#008300` | green |
+
+- **Lines, bars, stacks:** up to 7 series. More than 7 → group the rest as "Other"
+  or split into small charts.
+- **Scatter plots, maps, anything where every colour sits next to every other:**
+  max **3** series (slot 4 ochre is too close to the vermilion accent there).
+- Slots 3, 4 and 6 are light on white: label those series directly or add a table.
+- A series keeps its colour when filters change; colour follows the thing, not its rank.
+
+### Magnitude (sequential) and above/below (diverging)
+
+- **Sequential** (heatmaps, "how much"): one hue, vermilion from light to dark:
+  `#FBE3DA` `#F6C3B1` `#F0A084` `#EA7B55` `#E4572E` `#C4421D` `#9C3417` `#742712`.
+  For discrete ordered steps (tiers, funnel stages) start at `#F0A084` or darker.
+- **Diverging** (above/below target, gain/loss): blue ← grey `#EFEFEF` → vermilion.
+  Blue arm `#1F5FAD` `#2A78D6` `#86B3EA` `#B3CFF2`; vermilion arm `#F6C3B1`
+  `#F0A084` `#E4572E` `#C4421D`. The midpoint is always grey.
+
+### Chart anatomy
+
+- One y-axis only; never two scales on one chart.
+- Gridlines hairline `#E3E3E3`, axis line `#BDBDBD`, labels Nunito Sans 11 pt in `muted`.
+- Chart title = the takeaway, in Jost Bold; source line in caption style.
+- Values and labels are set in ink/muted text colours, not in the series colour.
+- Legend whenever there are 2+ series; with 4 or fewer, also label the lines directly.
+- Status colours (good / warning / critical) are *not* series colours; if you need
+  them, pair them with an icon and a word.
+
+### Diagrams
+
+- Flat shapes, 1 px strokes in `ink`, labels in Nunito Sans, titles in Jost.
+- Fill: `paper` (white) by default; the one element that matters in `accent` with
+  white bold text (≥ 14 pt).
+- Grouping: a light grey panel (`#F4F4F4`), not coloured borders.
+- If a diagram needs categories, use series slots 2 and 3 (blue, aqua) —
+  keep vermilion for the highlight.
+
+## 4. Layout principles (starting set)
 
 1. One idea per slide; a headline that states the takeaway.
 2. Generous white space — margins ≥ 5 % of slide width.
@@ -85,7 +146,7 @@ only at ≥ 18 pt bold; `ink` on `accent` works at any size (4.7 : 1).
 5. Diagrams: flat shapes, 1 px `line` strokes, labels in Nunito Sans, accent colour
    for the single element that matters.
 
-## 4. Setting it up in Google Workspace
+## 5. Setting it up in Google Workspace
 
 **Google Slides — create a master theme once**
 
@@ -109,7 +170,7 @@ Nunito Sans for labels; export as SVG/PNG and place into Slides/Docs.
 replace Futura → Jost and Avenir → Nunito Sans (PowerPoint: *Home → Replace →
 Replace Fonts*), then upload.
 
-## 5. Templates
+## 6. Templates
 
 | File | Use |
 |---|---|
@@ -122,7 +183,7 @@ On GitHub, the **Build brand templates** workflow reruns both scripts whenever
 templates. Locally: `cd brand/templates && npm ci && pip install -r requirements.txt`,
 then `node build_slides.js && python3 build_docs.py`.
 
-## 6. Licensing note
+## 7. Licensing note
 
 Futura and Avenir Next ship with macOS, but that licence covers use on that Mac —
 not web embedding or redistribution. Jost and Nunito Sans are under the SIL Open
@@ -130,5 +191,6 @@ Font License: free for any use, including commercial and embedding.
 
 ## Changelog
 
+- **v0.3** — Chart & diagram colours (validated for colour-blind readers), chart anatomy rules.
 - **v0.2** — Accent `#E4572E` confirmed as brand colour; added `accent_text` and contrast rule.
 - **v0.1** — Typography tiers, type scales, provisional accent, Workspace setup, Slides + Docs templates.
