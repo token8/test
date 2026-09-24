@@ -92,6 +92,9 @@ def add_table(rows):
                 shade(cell, "F4F4F4")
     doc.add_paragraph()
 
+doc.add_picture(str(HERE.parent / "logo" / "xlrte-color.png"), height=Cm(0.9))
+doc.paragraphs[-1].paragraph_format.space_after = Pt(18)
+
 lines = (HERE.parent / "STYLE_GUIDE.md").read_text().splitlines()
 i = 0
 while i < len(lines):
