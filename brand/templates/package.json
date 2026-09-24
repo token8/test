@@ -1,0 +1,7 @@
+{
+  "name": "brand-templates",
+  "private": true,
+  "description": "Builds the brand Slides template from ../tokens.json",
+  "scripts": { "build": "node build_slides.js" },
+  "dependencies": { "jszip": "^3.10.1", "pptxgenjs": "^4.0.1" }
+}

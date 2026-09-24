@@ -115,7 +115,12 @@ Replace Fonts*), then upload.
 |---|---|
 | `templates/brand-slides-template.pptx` | Upload to Drive, then open as Google Slides. Includes Title, Section and Content layouts plus example slides |
 | `templates/brand-docs-template.docx` | Upload to Drive, then open as Google Docs. Heading styles are pre-set and the file contains this guide |
-| `templates/build_slides.js`, `templates/build_docs.py` | Rebuild the templates from `tokens.json` after the guide changes |
+| `templates/build_slides.js`, `templates/build_docs.py` | Rebuild the templates from `tokens.json` and this guide |
+
+On GitHub, the **Build brand templates** workflow reruns both scripts whenever
+`tokens.json`, this guide or the build scripts change, and commits the fresh
+templates. Locally: `cd brand/templates && npm ci && pip install -r requirements.txt`,
+then `node build_slides.js && python3 build_docs.py`.
 
 ## 6. Licensing note
 

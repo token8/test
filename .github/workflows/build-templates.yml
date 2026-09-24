@@ -1,0 +1,50 @@
+# Rebuilds the Slides and Docs templates whenever the brand source changes,
+# and commits the regenerated files back to the same branch.
+name: Build brand templates
+
+on:
+  push:
+    paths:
+      - "brand/tokens.json"
+      - "brand/STYLE_GUIDE.md"
+      - "brand/templates/build_*"
+      - "brand/templates/package.json"
+      - "brand/templates/requirements.txt"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: brand/templates
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: npm ci --no-audit --no-fund
+      - run: pip install -r requirements.txt
+
+      - run: node build_slides.js
+      - run: python build_docs.py
+
+      - name: Commit regenerated templates
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add brand-slides-template.pptx brand-docs-template.docx
+          if git diff --cached --quiet; then
+            echo "Templates unchanged."
+          else
+            git commit -m "Rebuild brand templates from tokens"
+            git push
+          fi
