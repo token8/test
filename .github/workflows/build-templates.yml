@@ -8,6 +8,7 @@ on:
       - "brand/tokens.json"
       - "brand/STYLE_GUIDE.md"
       - "brand/templates/build_*"
+      - "brand/templates/masters.js"
       - "brand/templates/package.json"
       - "brand/templates/requirements.txt"
       - "brand/logo/*.png"
