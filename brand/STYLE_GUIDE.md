@@ -203,7 +203,9 @@ Always assign in this order, never skip or shuffle. Slot 1 is the brand accent.
 2. Font menu → *More fonts* → add **Jost** and **Nunito Sans**.
 3. Set the Title placeholder to Jost Bold, body placeholders to Nunito Sans.
 4. *Theme colours* → Accent 1 `#E4572E`, Dark 1 `#1A1A1A`, Light 1 `#FFFFFF`.
-5. Rename the theme (e.g. "Brand v0.2"), save the file as `TEMPLATE – Slides`.
+5. Insert the logo PNGs on the layouts (white wordmark on dark layouts, colour
+   wordmark in the footer of light ones).
+6. Rename the theme (e.g. "XLRTE v0.4"), save the file as `TEMPLATE – Slides`.
    New decks: *File → Make a copy*, or *Slide → Change theme → Import theme*.
 
 **Google Docs — set default styles**
