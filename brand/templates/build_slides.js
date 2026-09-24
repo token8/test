@@ -6,36 +6,36 @@ const t = require("../tokens.json");
 const H = t.font.heading.workspace, B = t.font.body.workspace;
 const C = Object.fromEntries(Object.entries(t.color).map(([k, v]) => [k, v.replace("#", "")]));
 const M = 0.6; // outer margin (inches)
+const LOGO = (file) => __dirname + "/../logo/" + file;
+const logoW = (h) => h * (1709 / 400); // wordmark aspect ratio (width / height of the PNGs)
 
 const pres = new pptxgen();
 pres.layout = "LAYOUT_16x9"; // 10 x 5.625 in
-pres.title = "Brand Slides Template v0.3";
+pres.title = "Brand Slides Template v0.4";
 pres.theme = { headFontFace: H, bodyFontFace: B };
 
-const footer = (color) => ({ text: { text: "BRAND · v0.3", options: {
-  x: M, y: 5.1, w: 3, h: 0.3, margin: 0, fontFace: H, fontSize: 9, charSpacing: 2, color } } });
+const footer = (file) => ({ image: { x: M, y: 5.12, h: 0.14, w: logoW(0.14), path: LOGO(file) } });
 
 pres.defineSlideMaster({ title: "Title", background: { color: C.ink }, objects: [
   { placeholder: { options: { name: "title", type: "title", x: M, y: 1.6, w: 8.2, h: 1.4, align: "left",
     fontFace: H, fontSize: 40, bold: true, color: C.paper, valign: "bottom", margin: 0 }, text: "" } },
   { placeholder: { options: { name: "subtitle", type: "body", x: M, y: 3.15, w: 8.2, h: 0.8,
     fontFace: B, fontSize: 18, color: "BDBDBD", valign: "top", margin: 0 }, text: "" } },
-  { rect: { x: M, y: 1.2, w: 0.28, h: 0.28, fill: { color: C.accent } } },
-  footer("8A8A8A") ] });
+  { image: { x: M, y: 0.6, h: 0.3, w: logoW(0.3), path: LOGO("xlrte-white.png") } } ] });
 
 pres.defineSlideMaster({ title: "Section", background: { color: C.accent }, objects: [
   { placeholder: { options: { name: "label", type: "body", x: M, y: 1.7, w: 6, h: 0.4,
     fontFace: H, fontSize: 14, charSpacing: 4, color: C.ink, margin: 0 }, text: "" } },
   { placeholder: { options: { name: "title", type: "title", x: M, y: 2.1, w: 8.2, h: 1.4, align: "left",
     fontFace: H, fontSize: 36, bold: true, color: C.paper, valign: "top", margin: 0 }, text: "" } },
-  footer(C.ink) ] });
+  footer("xlrte-black.png") ] });
 
 pres.defineSlideMaster({ title: "Content", background: { color: C.paper }, objects: [
   { placeholder: { options: { name: "title", type: "title", x: M, y: 0.45, w: 8.8, h: 0.9, align: "left",
     fontFace: H, fontSize: 28, bold: true, color: C.ink, valign: "top", margin: 0 }, text: "" } },
   { placeholder: { options: { name: "body", type: "body", x: M, y: 1.5, w: 8.8, h: 3.4,
     fontFace: B, fontSize: 16, color: C.ink, valign: "top", margin: 0 }, text: "" } },
-  footer(C.muted) ], slideNumber: { x: 9.0, y: 5.1, w: 0.4, h: 0.3, fontFace: H, fontSize: 9, color: C.muted, align: "right" } });
+  footer("xlrte-color.png") ], slideNumber: { x: 9.0, y: 5.1, w: 0.4, h: 0.3, fontFace: H, fontSize: 9, color: C.muted, align: "right" } });
 
 const txt = (s, text, o) => s.addText(text, { isTextBox: true, margin: 0, fontFace: B, color: C.ink, valign: "top", ...o });
 
@@ -128,6 +128,7 @@ txt(s, "Master tier (print / licensed): Futura PT + Avenir Next", { x: M, y: 3.6
 s = pres.addSlide({ masterName: "Title" });
 s.addText("Thank you", { placeholder: "title" });
 s.addText("name@example.com · website", { placeholder: "subtitle" });
+s.addImage({ path: LOGO("pe-white.png"), x: 9.4 - 0.3 * 1.295000, y: 4.95, h: 0.3, w: 0.3 * 1.295000, altText: "P·E" });
 
 const out = __dirname + "/brand-slides-template.pptx";
 // pptxgenjs stores parts uncompressed; re-deflate so the file is ~4x smaller to upload.

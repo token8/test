@@ -10,6 +10,7 @@ on:
       - "brand/templates/build_*"
       - "brand/templates/package.json"
       - "brand/templates/requirements.txt"
+      - "brand/logo/*.png"
   workflow_dispatch:
 
 permissions:

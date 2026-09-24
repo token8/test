@@ -1,9 +1,58 @@
-# Brand Style Guide — v0.3 (draft)
+# Brand Style Guide — v0.4 (draft)
 
 > Status: **developing**. This guide starts small and gets extended as decisions
 > are made. Anything marked *provisional* has not been decided yet.
 
-## 1. Typography
+## 1. Logo
+
+### XLRTE (company brand)
+
+**XLRTE** reads as *accelerate*. The wordmark is set in Jost Medium with 6 % letter
+spacing, converted to outlines. The left half of the X is a forward chevron in
+vermilion, split from the rest by a hairline gap: an arrow hidden in the first
+letter, pointing into the name. Everything else stays in ink. Understatement is
+the point: one accent, no decoration.
+
+| File | Use |
+|---|---|
+| `logo/xlrte-color.svg` | Default, on white or light backgrounds |
+| `logo/xlrte-white.svg` | On ink, dark photos, the dark title slide |
+| `logo/xlrte-black.svg` | Single colour: print, stamps, fax, embossing |
+| `logo/xlrte-mono-white.svg` | Single colour on vermilion or busy backgrounds |
+| `logo/x-monogram.svg`, `favicon.ico`, `favicon-16/32.png`, `apple-touch-icon.png` | Favicons, app icons, social avatars |
+
+PNG versions sit next to each SVG. Use the SVG wherever possible.
+
+### P·E (personal mark)
+
+Your initials, **P** (human: round, open) and **E** (machine: straight, modular),
+overlap slightly. Both letters are ink. Only the area they share is vermilion:
+the spark of human–machine interaction. Use it for your signature, profile and
+author line. XLRTE remains the company brand.
+
+Files: `logo/pe-color.svg`, `pe-white.svg`, `pe-black.svg`, `pe-mono-white.svg`. In the
+single-colour versions the spark becomes a cut-out.
+
+### Rules
+
+- **Clear space:** keep free space of at least **half the letter height** on all
+  sides. Nothing else may enter it.
+- **Minimum size:** letter height 16 px on screen (wordmark about 90 px wide),
+  6 mm in print. Below that, use the X monogram.
+- **Together:** XLRTE first, P·E after it, separated by a thin `line` rule and with
+  both at the same letter height.
+- **Backgrounds:** white or ink. On vermilion, use the single-colour versions.
+  On photos, use white, and only where the image is calm.
+
+**Don't**
+
+- recolour the chevron or the spark, or add a second accent colour
+- set XLRTE in live text: always use the logo files
+- change the letter spacing, stretch, rotate, outline or add shadows
+- place the colour logo on vermilion (the chevron disappears)
+- combine XLRTE and P·E into one mark
+
+## 2. Typography
 
 ### The core problem
 
@@ -57,7 +106,7 @@ PowerPoint, Word and Google Workspace. Medium/SemiBold weights may not.
 | Normal text | Nunito Sans | Regular | 11 pt, line spacing 1.3 |
 | Caption | Nunito Sans | Regular | 9 pt |
 
-## 2. Colour
+## 3. Colour
 
 Neutral base plus **one** accent: a warm vermilion that echoes the geometric,
 Bauhaus-era roots of Futura. Use it sparingly — roughly 10 % of any page or slide.
@@ -76,7 +125,7 @@ Bauhaus-era roots of Futura. Use it sparingly — roughly 10 % of any page or sl
 `accent_text` (5.1 : 1, meets WCAG AA). White text on an `accent` background
 only at ≥ 18 pt bold; `ink` on `accent` works at any size (4.7 : 1).
 
-## 3. Charts & diagrams
+## 4. Charts & diagrams
 
 Charts use the same two typefaces and the same accent. Colours below were checked
 with a colour-vision-deficiency validator (adjacent series stay distinguishable
@@ -137,7 +186,7 @@ Always assign in this order, never skip or shuffle. Slot 1 is the brand accent.
 - If a diagram needs categories, use series slots 2 and 3 (blue, aqua) —
   keep vermilion for the highlight.
 
-## 4. Layout principles (starting set)
+## 5. Layout principles (starting set)
 
 1. One idea per slide; a headline that states the takeaway.
 2. Generous white space — margins ≥ 5 % of slide width.
@@ -146,7 +195,7 @@ Always assign in this order, never skip or shuffle. Slot 1 is the brand accent.
 5. Diagrams: flat shapes, 1 px `line` strokes, labels in Nunito Sans, accent colour
    for the single element that matters.
 
-## 5. Setting it up in Google Workspace
+## 6. Setting it up in Google Workspace
 
 **Google Slides — create a master theme once**
 
@@ -170,7 +219,7 @@ Nunito Sans for labels; export as SVG/PNG and place into Slides/Docs.
 replace Futura → Jost and Avenir → Nunito Sans (PowerPoint: *Home → Replace →
 Replace Fonts*), then upload.
 
-## 6. Templates
+## 7. Templates
 
 | File | Use |
 |---|---|
@@ -183,7 +232,7 @@ On GitHub, the **Build brand templates** workflow reruns both scripts whenever
 templates. Locally: `cd brand/templates && npm ci && pip install -r requirements.txt`,
 then `node build_slides.js && python3 build_docs.py`.
 
-## 7. Licensing note
+## 8. Licensing note
 
 Futura and Avenir Next ship with macOS, but that licence covers use on that Mac —
 not web embedding or redistribution. Jost and Nunito Sans are under the SIL Open
@@ -191,6 +240,7 @@ Font License: free for any use, including commercial and embedding.
 
 ## Changelog
 
+- **v0.4** — Logo: XLRTE wordmark with forward chevron, X monogram and favicons, P·E personal mark.
 - **v0.3** — Chart & diagram colours (validated for colour-blind readers), chart anatomy rules.
 - **v0.2** — Accent `#E4572E` confirmed as brand colour; added `accent_text` and contrast rule.
 - **v0.1** — Typography tiers, type scales, provisional accent, Workspace setup, Slides + Docs templates.
