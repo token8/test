@@ -1,2 +1,3 @@
 node_modules/
 brand/logo/.cache/
+__pycache__/
