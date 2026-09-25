@@ -34,7 +34,7 @@ fit scoring (next release), and fine-tuning Laya.
 - [x] Laya integration skill vendored to `.claude/skills/laya-integration/`; house skill `.claude/skills/decision-layer/`
 - [x] Manifesto located (Drive: `manifesto.md`, Constitution v3.1) and mapped to decision rules (spec §4)
 - [x] Spec written first: `decision-layer/SPEC.md` (§9 SDD)
-- [x] Tests with every failure path: 45 passing (`decision-layer/tests/`)
+- [x] Tests with every failure path: 52 passing (`decision-layer/tests/`), including a contract test against upstream `laya-serve`
 - [x] Parallel panel + governance in `decision_layer/core/` (no vendor code, §10); HTTP, `.env` and ledger in `infrastructure/`
 - [x] CRM home created: `job-crm/` with `decisions/questions.json`, `decisions/governance.json`, `.env.example`, `.gitignore`
 - [x] Remote authorization for TypeSafe recorded in `governance.json` (owner, 2026-09-25, §3.1)
@@ -45,19 +45,23 @@ fit scoring (next release), and fine-tuning Laya.
 - [x] TypeSafe is called in parallel, not only as fallback (owner, 2026-09-25)
 - [x] API key lives in `job-crm/.env`, git-ignored (§11)
 - [ ] Create `job-crm/.env` from `.env.example` with the TypeSafe key; rotate quarterly
-- [ ] Where the Laya sidecar runs (laptop, home server, VM), and which checkpoint: English, or `multilingual` for German mail (uncalibrated, see the skill)
+- [x] Checkpoint: English and `multilingual` both loaded; `laya-serve` routes each email by language (checked on German and English samples against laya's own router)
+- [ ] Where the Laya container runs (laptop, home server, VM): 2 checkpoints ≈ 1.5 GB of weights, about 3 GB of RAM on CPU
 - [ ] Pin `JEV_MODEL` for the release
 - [ ] Confirm the FSM (`governance.json` → `fsm.application`) matches the CRM's real stages
 
 ### 2. Build
 - [ ] CRM calls `open_panel("job-crm")` once at startup and `panel.decide(state, questions, {"application": <current stage>})` once per email
-- [ ] Sidecar as a service (systemd or Docker), health check at `/health`
+- [x] Laya as a container: `decision-layer/docker/` (laya-serve 0.3.20, loopback only, read-only, non-root, health check)
+- [ ] Build and start it on the chosen host; allow `huggingface.co` there for the first weight download
 - [ ] Apply `act` results. Queue `propose` (y/N buttons) and `review` (pick an answer). Store the human's answer as a label
 - [ ] Surface the audit trail: `job-crm/logs/decisions.jsonl` (no text) and `llm_calls.jsonl` (tokens, cost)
 - [ ] Feature flag around automatic `act`
 
 ### 3. Evaluate (before enabling the flag)
-- [ ] Label 100-200 real emails (those already filed by hand count)
+- [x] Evaluation tool: `python -m decision_layer.infrastructure.evaluate job-crm job-crm/data/labels.jsonl` (per-model and panel accuracy, act / propose / review shares, act right, latency, tokens, GO / NO-GO)
+- [x] Label format with fictional examples: `job-crm/decisions/eval/sample.jsonl`
+- [ ] Label 100-200 real emails into `job-crm/data/labels.jsonl` (git-ignored); those already filed by hand count
 - [ ] Per question: accuracy of Laya, Jev and the panel; share of act / propose / review; p50/p95 latency; monthly cost
 - [ ] Try 2-3 phrasings per question; tune thresholds and weights in `governance.json` from the data (bump its `version`)
 - [ ] Go/no-go: `act` decisions ≥ 97% right, `review` share ≤ 25%, spend within the $5/month ceiling
@@ -93,6 +97,10 @@ fit scoring (next release), and fine-tuning Laya.
 ## Change log
 
 - 2026-09-25: Plan created (Laya first, Jev as fallback).
+- 2026-09-25: Owner approved the proposals: multilingual routing for German mail, CRM home in
+  `job-crm/`, and moving to a private repo if the code is private. Added the laya-serve
+  container, the evaluation tool and the label format. A real Laya run from the cloud session
+  was blocked, because the environment's network policy denies `huggingface.co` (the weights).
 - 2026-09-25: Owner direction: call TypeSafe in parallel, and derive the final decision from
   governance and the manifesto. The decision panel, spec, `job-crm/` home and `.env`
   convention were added.

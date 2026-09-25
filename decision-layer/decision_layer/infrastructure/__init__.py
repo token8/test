@@ -10,7 +10,7 @@ import os
 import threading
 from datetime import datetime, timezone
 
-from ..client import Jev, LayaHTTP, LAYA_URL
+from ..client import JEV_URL, Jev, LayaHTTP, LAYA_URL
 from ..core import Governance, Panel
 
 
@@ -76,9 +76,11 @@ def load_questions(product_dir):
 def open_panel(product_dir, env_file=".env"):
     """Build a panel from a product folder: its .env (secrets), governance.json and log dir."""
     load_env(os.path.join(product_dir, env_file))
-    backends = [LayaHTTP(os.environ.get("LAYA_URL", LAYA_URL))]
+    backends = [LayaHTTP(os.environ.get("LAYA_URL", LAYA_URL), model=os.environ.get("LAYA_MODEL") or None,
+                         api_key=os.environ.get("LAYA_API_KEY") or None)]
     if os.environ.get("TYPESAFE_API_KEY"):
-        backends.append(Jev(os.environ["TYPESAFE_API_KEY"], model=os.environ.get("JEV_MODEL", "jev-latest")))
+        backends.append(Jev(os.environ["TYPESAFE_API_KEY"], model=os.environ.get("JEV_MODEL", "jev-latest"),
+                            url=os.environ.get("JEV_URL", JEV_URL)))
     ledger = JsonlLedger(os.path.join(product_dir, os.environ.get("DECISION_LOG_DIR", "logs")))
     return Panel(backends, load_governance(product_dir), ledger,
                  remote_enabled=os.environ.get("DECISION_REMOTE", "1") != "0")

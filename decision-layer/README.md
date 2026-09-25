@@ -29,9 +29,16 @@ for it. Both take the same request (`state`, `questions` of type `choice` / `sco
 ## Use
 
 ```bash
-pip install laya && python -m decision_layer.sidecar   # Laya on 127.0.0.1:8771
-cp job-crm/.env.example job-crm/.env                   # TYPESAFE_API_KEY=...
+docker compose -f decision-layer/docker/compose.yaml up -d   # laya-serve 0.3.20 on 127.0.0.1:8771
+cp job-crm/.env.example job-crm/.env                          # TYPESAFE_API_KEY=...
 ```
+
+Laya runs as upstream `laya-serve`, which speaks Jev's own protocol (`POST /v1/systemone`), so one
+client serves both models. Its router sends each email to the right checkpoint (German to
+`multilingual`, English to `english`). The container binds to loopback only, runs read-only as
+a non-root user, and caches the weights in a volume. Without Docker, run
+`pip install "laya[serve]==0.3.20" && LAYA_HOST=127.0.0.1 LAYA_PORT=8771 LAYA_MODELS=english,multilingual laya-serve`.
+Never leave `LAYA_HOST` at its default `0.0.0.0` on a shared network.
 
 ```python
 from decision_layer.infrastructure import open_panel, load_questions
@@ -52,7 +59,10 @@ weights, a stage FSM, a budget and the recorded remote authorization.
 |---|---|---|
 | `TYPESAFE_API_KEY` | unset | Unset means Laya only |
 | `JEV_MODEL` | `jev-latest` | Pin a Jev version for a release |
-| `LAYA_URL` | `http://127.0.0.1:8771` | Laya sidecar (`LAYA_CHECKPOINT=multilingual` for non-English) |
+| `LAYA_URL` | `http://127.0.0.1:8771` | laya-serve (or the fallback `decision_layer.sidecar`) |
+| `LAYA_MODEL` | unset | Unset means laya-serve picks the checkpoint per email by language |
+| `LAYA_API_KEY` | unset | Bearer token, if laya-serve requires one |
+| `JEV_URL` | TypeSafe API | Point at a LiteLLM pass-through or a test double |
 | `DECISION_REMOTE` | `1` | `0` is the kill switch: nothing leaves the machine, and each record says so |
 | `DECISION_LOG_DIR` | `logs` | Audit trail location inside the product folder |
 
@@ -63,19 +73,32 @@ weights, a stage FSM, a budget and the recorded remote authorization.
   low-confidence answers. It's cheaper, but has no governance layer. Use it where no remote
   authorization is recorded and cost matters more than a second opinion.
 
+## Evaluate (before letting it act)
+
+```bash
+python -m decision_layer.infrastructure.evaluate job-crm job-crm/data/labels.jsonl --out job-crm/data/eval.md
+```
+
+Label format and a fictional sample: [`job-crm/decisions/eval/sample.jsonl`](../job-crm/decisions/eval/sample.jsonl).
+The report gives accuracy per model and for the panel, the act / propose / review shares, how
+often `act` was right, latency, and remote tokens, with a GO / NO-GO per question (defaults:
+`act` ≥ 97% right, `review` ≤ 25%). Evaluation calls are real calls and count against the budget.
+
 ## Layout
 
 ```
 decision_layer/core/            combine votes, governance rules, parallel panel: stdlib only, no I/O (§10)
-decision_layer/infrastructure/  .env loader, JSONL ledger, open_panel()
-decision_layer/client.py        HTTP backends (Laya sidecar, Jev) and the cascade client
-decision_layer/sidecar.py       Laya as a loopback HTTP service
+decision_layer/infrastructure/  .env loader, JSONL ledger, open_panel(), evaluate
+decision_layer/client.py        HTTP backends (Laya, Jev: same protocol) and the cascade client
+decision_layer/sidecar.py       minimal stdlib Laya server, for where laya[serve] can't be installed
+docker/                         laya-serve container: loopback, read-only, non-root
 ```
 
 ## Test
 
 ```bash
-cd decision-layer && python3 -m unittest discover -s tests     # 45 tests, all failure paths in SPEC §6
+cd decision-layer && python3 -m unittest discover -s tests     # 52 tests, all failure paths in SPEC §6
+# the 3 laya-serve contract tests run when laya[serve] is installed, and skip otherwise
 ```
 
 Laya is by Nandakishor M, Convai Innovations ([Apache-2.0](https://github.com/NandhaKishorM/laya)).

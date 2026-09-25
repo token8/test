@@ -44,7 +44,7 @@ class LedgerTest(unittest.TestCase):
 
 
 class FakeModels(BaseHTTPRequestHandler):
-    """Laya sidecar at /predict and Jev at /v1/systemone on one port."""
+    """Laya and Jev speak the same protocol (POST /v1/systemone); the Jev fake is the one called with its key."""
     jev_status = 200
 
     def log_message(self, *a):
@@ -52,7 +52,9 @@ class FakeModels(BaseHTTPRequestHandler):
 
     def do_POST(self):
         body = json.loads(self.rfile.read(int(self.headers["Content-Length"])))
-        if self.path == "/v1/systemone" and self.jev_status != 200:
+        assert self.path == "/v1/systemone", self.path
+        is_jev = self.headers.get("Authorization") == "Bearer test-key"
+        if is_jev and self.jev_status != 200:
             self.send_response(self.jev_status)
             self.send_header("Content-Length", "0")
             self.end_headers()
@@ -67,8 +69,7 @@ class FakeModels(BaseHTTPRequestHandler):
                 answers[qid] = {"type": "choice", "probabilities": {k: (0.9 if k == "interview" else 0.1 / (len(q["criteria"]) - 1))
                                                                      for k in q["criteria"]}}
         out = {"answers": answers}
-        if self.path == "/v1/systemone":
-            assert self.headers["Authorization"] == "Bearer test-key"
+        if is_jev:
             out |= {"model": body["model"], "usage": {"input_tokens": 400}}
         data = json.dumps(out).encode()
         self.send_response(200)
@@ -85,10 +86,10 @@ class EndToEndTest(unittest.TestCase):
         self.product = tempfile.mkdtemp()
         shutil.copytree(os.path.join(JOB_CRM, "decisions"), os.path.join(self.product, "decisions"))
         with open(os.path.join(self.product, ".env"), "w") as f:
-            f.write("TYPESAFE_API_KEY=test-key\nLAYA_URL=%s\nJEV_MODEL=jev-test\n" % self.url)
+            f.write("TYPESAFE_API_KEY=test-key\nLAYA_URL=%s\nJEV_MODEL=jev-test\nJEV_URL=%s/v1/systemone\n" % (self.url, self.url))
         self.env = mock.patch.dict(os.environ, {}, clear=False)
         self.env.start()
-        for k in ("TYPESAFE_API_KEY", "LAYA_URL", "JEV_MODEL", "DECISION_REMOTE", "DECISION_LOG_DIR"):
+        for k in ("TYPESAFE_API_KEY", "LAYA_URL", "LAYA_MODEL", "LAYA_API_KEY", "JEV_MODEL", "JEV_URL", "DECISION_REMOTE", "DECISION_LOG_DIR"):
             os.environ.pop(k, None)
 
     def tearDown(self):
@@ -100,7 +101,6 @@ class EndToEndTest(unittest.TestCase):
 
     def _panel(self):
         p = open_panel(self.product)
-        p.backends[1].url = self.url + "/v1/systemone"          # point Jev at the fake
         p.backends[1].retries = 0
         return p
 

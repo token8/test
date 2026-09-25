@@ -100,5 +100,11 @@ JSONL ledger and the Laya sidecar.
   in parallel with Laya (not only as a fallback). This is recorded in `job-crm/decisions/governance.json`.
 - 2026-09-25: Jev is classed as Tier 2 (hosted fast inference, about $0.04 per million
   tokens), not Tier 3 frontier. Parallel calls therefore keep `token_economy_ratio` intact.
+- 2026-09-25: Laya is served by upstream `laya-serve` (laya 0.3.20), which speaks Jev's
+  `/v1/systemone` protocol, so both backends share one client. Its router picks the
+  checkpoint per email by language. The contract with it is tested
+  (`tests/test_laya_serve_contract.py`), and German detection was checked against laya's own router.
+- 2026-09-25: `Decision.votes` holds each backend's raw answer in memory, for evaluation.
+  It is never written to the audit log.
 - 2026-09-25: The cascade client (`decision_layer/client.py`, Laya first and Jev only on doubt)
   is kept as the low-cost mode for products without a remote authorization.

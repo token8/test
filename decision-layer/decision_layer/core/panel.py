@@ -9,7 +9,7 @@ import hashlib
 import json
 import time
 from concurrent.futures import ThreadPoolExecutor
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime, timezone
 
 
@@ -17,6 +17,7 @@ from datetime import datetime, timezone
 class Decision:
     results: dict      # qid -> {status, value, probability, sources, agree, transition, rules}
     record: dict       # what went to the audit log
+    votes: dict = field(default_factory=dict)   # qid -> {backend: raw answer}; in memory only, never logged
 
     def status(self, qid):
         return self.results[qid]["status"]
@@ -65,9 +66,9 @@ class Panel:
             futures = {name: pool.submit(self._call, b, state, qs) for name, (b, qs) in plan.items()}
             calls = {name: f.result() for name, f in futures.items()}
 
-        results = {}
+        results, all_votes = {}, {}
         for qid, q in questions.items():
-            votes = {name: c["answers"][qid] for name, c in calls.items() if qid in c["answers"]}
+            votes = all_votes[qid] = {name: c["answers"][qid] for name, c in calls.items() if qid in c["answers"]}
             degraded = [name for name in expected[qid] if name not in votes]
             results[qid] = self.gov.decide(qid, q.get("type"), votes, degraded, context)
 
@@ -88,4 +89,4 @@ class Panel:
                         | {"rules": sorted(r["rules"])} for qid, r in results.items()},
         }
         self.ledger.record_decision(record)
-        return Decision(results, record)
+        return Decision(results, record, all_votes)

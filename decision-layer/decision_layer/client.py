@@ -65,14 +65,17 @@ def _post(url, body, headers, timeout):
 
 
 class LayaHTTP:
-    """Laya running as a loopback sidecar (see sidecar.py)."""
+    """Laya over the Jev wire protocol (POST /v1/systemone), as served by upstream `laya-serve`
+    (preferred) or sidecar.py. No `model` lets laya-serve's router pick the checkpoint by language."""
     name, remote = "laya", False
 
-    def __init__(self, url=LAYA_URL, timeout=2.0):
-        self.url, self.timeout = url.rstrip("/"), timeout
+    def __init__(self, url=LAYA_URL, timeout=5.0, model=None, api_key=None):
+        self.url, self.timeout, self.model, self.api_key = url.rstrip("/"), timeout, model, api_key
 
     def predict(self, state, questions):
-        return _post(self.url + "/predict", {"state": state, "questions": questions}, {}, self.timeout)
+        body = {"state": state, "questions": questions, **({"model": self.model} if self.model else {})}
+        headers = {"Authorization": "Bearer " + self.api_key} if self.api_key else {}
+        return _post(self.url + "/v1/systemone", body, headers, self.timeout)
 
 
 class Jev:

@@ -1,10 +1,14 @@
-"""Laya as a loopback HTTP sidecar, so non-Python apps (and DecisionClient) can call it.
+"""Minimal Laya sidecar (stdlib HTTP, one checkpoint). Fallback for where `laya[serve]` can't be installed.
+
+Prefer upstream `laya-serve` (pip install "laya[serve]"): same wire protocol, language routing
+across checkpoints, request limits, bearer auth. See docker/ in this folder.
 
     pip install laya
     python -m decision_layer.sidecar            # 127.0.0.1:8771
 
-    POST /predict  {"state": ..., "questions": {...}}  -> Laya's predict() result
-    GET  /health   -> {"ok": true, "checkpoint": ...}
+    POST /v1/systemone  {"state": ..., "questions": {...}}  -> Laya's predict() result (Jev protocol)
+    POST /predict       same, older path
+    GET  /health        -> {"ok": true, "checkpoint": ...}
 
 LAYA_CHECKPOINT picks a subfolder ("", "multilingual", "typed-decisions"); LAYA_PORT the port.
 One model, one lock: a GPU serves one forward pass at a time.
@@ -45,7 +49,7 @@ class Handler(BaseHTTPRequestHandler):
             self._send(404, {"error": "not found"})
 
     def do_POST(self):
-        if self.path != "/predict":
+        if self.path not in ("/v1/systemone", "/predict"):
             return self._send(404, {"error": "not found"})
         try:
             body = json.loads(self.rfile.read(int(self.headers.get("Content-Length", 0))))

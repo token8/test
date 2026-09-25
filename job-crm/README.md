@@ -10,9 +10,11 @@ job-crm/
   decisions/
     questions.json     typed questions for Laya and Jev (any language can read it)
     governance.json    how votes become act / propose / review; inherits the manifesto (v3.1)
+    eval/sample.jsonl  label format, with fictional examples (real labels go in data/)
   .env.example         copy to .env (git-ignored) and add TYPESAFE_API_KEY
   .gitignore           keeps .env, logs/ and data/ out of git
   logs/                decisions.jsonl and llm_calls.jsonl (created at runtime, git-ignored)
+  data/                real labelled emails and eval reports (git-ignored)
   src/                 ← the CRM code goes here (core/ business logic, infrastructure/ vendors: §10)
 ```
 
@@ -26,7 +28,7 @@ folder moves with it unchanged.
 ## Using decisions from the CRM
 
 ```bash
-pip install laya && python -m decision_layer.sidecar       # Laya on 127.0.0.1:8771
+docker compose -f decision-layer/docker/compose.yaml up -d  # Laya on 127.0.0.1:8771
 cp job-crm/.env.example job-crm/.env                        # add TYPESAFE_API_KEY
 ```
 

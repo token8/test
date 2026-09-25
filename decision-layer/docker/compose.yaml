@@ -1,0 +1,24 @@
+# Laya for the decision panel. Published on loopback only: mail text never leaves the machine (§3.1).
+services:
+  laya:
+    build: .
+    image: laya-serve:0.3.20
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8771:8771"
+    environment:
+      LAYA_MODELS: english,multilingual   # router picks per email: German -> multilingual
+      LAYA_THREADS: "4"                   # <= physical cores
+      # LAYA_API_KEY: set to require a bearer token (then LAYA_API_KEY in <product>/.env too)
+      # HF_HUB_OFFLINE: "1"               # after the first download
+    volumes:
+      - laya-models:/models               # weights cache (~1.5 GB), survives rebuilds
+    read_only: true                       # §11: read-only container
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop: [ALL]
+
+volumes:
+  laya-models:
