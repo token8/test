@@ -1,6 +1,6 @@
 """Evaluate a product's decision panel on labelled examples (release checklist step 3).
 
-    python -m decision_layer.infrastructure.evaluate job-crm job-crm/data/labels.jsonl --out job-crm/data/eval.md
+    python -m decision_layer.infrastructure.evaluate <product> <product>/data/labels.jsonl --out <product>/data/eval.md
 
 labels.jsonl, one example per line (keep it in the git-ignored data/ folder, it holds real mail):
     {"id": "m-001", "state": {"subject": "...", "body": "..."}, "context": {"application": "applied"},

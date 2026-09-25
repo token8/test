@@ -1,5 +1,5 @@
-"""Question sets for the cascade client (client.py). The panel reads job-crm/decisions/questions.json,
-which is the source of truth; keep the two in step. Measure on real mail before trusting them.
+"""Question sets for the cascade client (client.py). The panel reads <product>/decisions/questions.json
+(see example/), which is the source of truth; keep the two in step. Measure on real mail before trusting them.
 
 Questions ask what the text says (not what to do), and every option carries a description,
 as the Laya skill recommends. Mapping answers to CRM actions happens in code.

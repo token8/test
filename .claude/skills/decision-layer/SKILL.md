@@ -13,7 +13,7 @@ Adding decisions to a product:
 1. Create `<product>/decisions/questions.json`. Write the questions per
    `.claude/skills/laya-integration/SKILL.md`: ask what the text says, describe every
    option, and turn numbers into words.
-2. Create `<product>/decisions/governance.json`: copy `job-crm/decisions/governance.json`,
+2. Create `<product>/decisions/governance.json`: copy `decision-layer/example/decisions/governance.json`,
    then set `inherits`, thresholds, weights (score questions lean on Jev), an FSM for any
    answer that changes state, and `approval_required` for terminal or costly states.
 3. Remote calls need a `remote_authorization` block (who, when, scope) (§3.1). Without it,

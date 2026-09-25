@@ -97,7 +97,8 @@ JSONL ledger and the Laya sidecar.
 ## 9. Decisions log
 
 - 2026-09-25: The owner authorized sending job-search decision questions to TypeSafe Jev,
-  in parallel with Laya (not only as a fallback). This is recorded in `job-crm/decisions/governance.json`.
+  in parallel with Laya (not only as a fallback). This is recorded in that product's own (private) `decisions/governance.json`;
+  `example/decisions/governance.json` shows the shape.
 - 2026-09-25: Jev is classed as Tier 2 (hosted fast inference, about $0.04 per million
   tokens), not Tier 3 frontier. Parallel calls therefore keep `token_economy_ratio` intact.
 - 2026-09-25: Laya is served by upstream `laya-serve` (laya 0.3.20), which speaks Jev's

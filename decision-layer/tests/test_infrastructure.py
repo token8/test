@@ -1,4 +1,4 @@
-"""Infrastructure: .env loading, ledger, end-to-end over HTTP, and the job-crm config files."""
+"""Infrastructure: .env loading, ledger, end-to-end over HTTP, and the example product's config files."""
 
 import json
 import os
@@ -11,7 +11,7 @@ from unittest import mock
 
 from decision_layer.infrastructure import JsonlLedger, load_env, load_governance, load_questions, open_panel
 
-JOB_CRM = os.path.join(os.path.dirname(__file__), "..", "..", "job-crm")
+JOB_CRM = os.path.join(os.path.dirname(__file__), "..", "example")
 
 
 def read(*path):
@@ -131,7 +131,7 @@ class EndToEndTest(unittest.TestCase):
 
 
 class JobCrmConfigTest(unittest.TestCase):
-    """The shipped job-crm governance and questions stay consistent with each other."""
+    """The shipped example governance and questions stay consistent with each other."""
 
     def test_config_is_consistent(self):
         gov, qs = load_governance(JOB_CRM), load_questions(JOB_CRM)

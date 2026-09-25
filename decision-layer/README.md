@@ -30,7 +30,7 @@ for it. Both take the same request (`state`, `questions` of type `choice` / `sco
 
 ```bash
 docker compose -f decision-layer/docker/compose.yaml up -d   # laya-serve 0.3.20 on 127.0.0.1:8771
-cp job-crm/.env.example job-crm/.env                          # TYPESAFE_API_KEY=...
+cp decision-layer/example/.env.example <product>/.env         # TYPESAFE_API_KEY=...
 ```
 
 Laya runs as upstream `laya-serve`, which speaks Jev's own protocol (`POST /v1/systemone`), so one
@@ -43,8 +43,8 @@ Never leave `LAYA_HOST` at its default `0.0.0.0` on a shared network.
 ```python
 from decision_layer.infrastructure import open_panel, load_questions
 
-panel = open_panel("job-crm")        # <product>/.env, decisions/governance.json, logs/
-d = panel.decide(state, load_questions("job-crm"), {"application": "applied"})
+panel = open_panel("<product>")      # <product>/.env, decisions/governance.json, logs/
+d = panel.decide(state, load_questions("<product>"), {"application": "applied"})
 d.results["stage"]   # {"status": "act", "value": "interview", "probability": 0.93,
                      #  "sources": ["jev", "laya"], "agree": True,
                      #  "transition": {"from": "applied", "to": "interviewing"},
@@ -52,7 +52,7 @@ d.results["stage"]   # {"status": "act", "value": "interview", "probability": 0.
 ```
 
 A product brings two JSON files: `decisions/questions.json` and `decisions/governance.json`.
-See [`job-crm/decisions/`](../job-crm/decisions/) for a complete example with thresholds,
+See [`example/decisions/`](example/decisions/) for a complete (fictional) example with thresholds,
 weights, a stage FSM, a budget and the recorded remote authorization.
 
 | Setting (`<product>/.env`) | Default | Effect |
@@ -76,10 +76,10 @@ weights, a stage FSM, a budget and the recorded remote authorization.
 ## Evaluate (before letting it act)
 
 ```bash
-python -m decision_layer.infrastructure.evaluate job-crm job-crm/data/labels.jsonl --out job-crm/data/eval.md
+python -m decision_layer.infrastructure.evaluate <product> <product>/data/labels.jsonl --out <product>/data/eval.md
 ```
 
-Label format and a fictional sample: [`job-crm/decisions/eval/sample.jsonl`](../job-crm/decisions/eval/sample.jsonl).
+Label format and a fictional sample: [`example/decisions/eval/sample.jsonl`](example/decisions/eval/sample.jsonl).
 The report gives accuracy per model and for the panel, the act / propose / review shares, how
 often `act` was right, latency, and remote tokens, with a GO / NO-GO per question (defaults:
 `act` ≥ 97% right, `review` ≤ 25%). Evaluation calls are real calls and count against the budget.

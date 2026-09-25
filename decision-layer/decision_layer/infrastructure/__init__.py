@@ -1,8 +1,8 @@
 """Infrastructure for the decision panel: .env loading, JSONL ledger, and wiring a product folder.
 
     from decision_layer.infrastructure import open_panel, load_questions
-    panel = open_panel("job-crm")                     # reads job-crm/.env and job-crm/decisions/*
-    d = panel.decide(state, load_questions("job-crm"), {"application": "applied"})
+    panel = open_panel("example")                     # reads example/.env and example/decisions/*
+    d = panel.decide(state, load_questions("example"), {"application": "applied"})
 """
 
 import json
