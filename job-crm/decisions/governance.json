@@ -1,0 +1,54 @@
+{
+  "version": "1.0.0",
+  "inherits": {
+    "document": "CoreState OSS: Active Constitution",
+    "version": "3.1",
+    "sections": ["§1.5", "§2", "§3.1", "§3.3", "§5", "§9", "§10", "§11"]
+  },
+  "remote_authorization": {
+    "granted_by": "owner",
+    "date": "2026-09-25",
+    "scope": "Job-search emails and postings may be sent to TypeSafe Jev for typed decisions, in parallel with local Laya",
+    "basis": "Owner instruction of 2026-09-25 (§3.1 Law of Sovereignty). Remove this block to keep all data local."
+  },
+  "budget": {
+    "monthly_usd_ceiling": 5.0,
+    "price_per_mtok": { "jev": 0.042 }
+  },
+  "weights": {
+    "default": { "laya": 1.0, "jev": 1.0 },
+    "score": { "laya": 0.5, "jev": 1.5 }
+  },
+  "defaults": {
+    "act_threshold": 0.85,
+    "degraded_threshold": 0.95,
+    "require_agreement": true,
+    "autonomy": "act",
+    "remote": true
+  },
+  "questions": {
+    "stage": { "act_threshold": 0.80, "fsm": "application" },
+    "needs_reply": { "act_threshold": 0.90 },
+    "urgency": { "act_threshold": 0.60, "require_agreement": false }
+  },
+  "fsm": {
+    "application": {
+      "map": {
+        "received": "applied",
+        "interview": "interviewing",
+        "offer": "offer",
+        "rejection": "rejected",
+        "recruiter_outreach": "lead",
+        "other": null
+      },
+      "transitions": {
+        "(none)": ["lead", "applied"],
+        "lead": ["applied", "withdrawn"],
+        "applied": ["interviewing", "rejected", "withdrawn"],
+        "interviewing": ["interviewing", "offer", "rejected", "withdrawn"],
+        "offer": ["accepted", "rejected", "withdrawn"]
+      },
+      "approval_required": ["offer", "rejected", "accepted", "withdrawn"]
+    }
+  }
+}

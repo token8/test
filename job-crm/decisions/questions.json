@@ -1,0 +1,24 @@
+{
+  "$comment": "Typed questions for Laya and Jev (same schema). Ask what the text says; map answers to CRM actions in code. See .claude/skills/laya-integration.",
+  "stage": {
+    "type": "choice",
+    "instructions": "What does this email tell the candidate about their job application?",
+    "criteria": {
+      "received": "confirms an application was received or is under review",
+      "interview": "invites to, schedules or moves an interview or assessment",
+      "offer": "makes or discusses a job offer, salary or contract",
+      "rejection": "declines the application or says the role is filled",
+      "recruiter_outreach": "a recruiter introduces a new role the candidate has not applied for",
+      "other": "newsletters, job alerts, receipts and anything else"
+    }
+  },
+  "needs_reply": {
+    "type": "noul",
+    "instructions": "Does the sender ask the candidate to reply, confirm or choose a time?"
+  },
+  "urgency": {
+    "type": "score",
+    "instructions": "How soon does the candidate need to act on this email?",
+    "criteria": ["no action needed", "within a week", "within a day or a stated deadline"]
+  }
+}

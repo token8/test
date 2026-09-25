@@ -66,7 +66,7 @@ def _post(url, body, headers, timeout):
 
 class LayaHTTP:
     """Laya running as a loopback sidecar (see sidecar.py)."""
-    name = "laya"
+    name, remote = "laya", False
 
     def __init__(self, url=LAYA_URL, timeout=2.0):
         self.url, self.timeout = url.rstrip("/"), timeout
@@ -77,7 +77,7 @@ class LayaHTTP:
 
 class Jev:
     """TypeSafe's hosted Jev. Retries briefly on rate limits and 5xx, then gives up."""
-    name = "jev"
+    name, remote = "jev", True
     RETRY = {429, 500, 502, 503, 504, 529}
 
     def __init__(self, api_key, model="jev-latest", url=JEV_URL, timeout=5.0, retries=2):
@@ -102,9 +102,9 @@ class DecisionClient:
 
     @classmethod
     def from_env(cls, **kw):
-        """LAYA_URL, TYPESAFE_API_KEY, JEV_MODEL; DECISION_REMOTE_FALLBACK=0 turns Jev off."""
+        """LAYA_URL, TYPESAFE_API_KEY, JEV_MODEL; DECISION_REMOTE=0 turns Jev off."""
         key = os.environ.get("TYPESAFE_API_KEY")
-        remote = os.environ.get("DECISION_REMOTE_FALLBACK", "1") != "0"
+        remote = os.environ.get("DECISION_REMOTE", os.environ.get("DECISION_REMOTE_FALLBACK", "1")) != "0"
         fallback = Jev(key, model=os.environ.get("JEV_MODEL", "jev-latest")) if key and remote else None
         return cls(LayaHTTP(os.environ.get("LAYA_URL", LAYA_URL)), fallback, **kw)
 

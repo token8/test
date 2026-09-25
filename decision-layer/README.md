@@ -1,82 +1,82 @@
-# Decision layer: Laya first, TypeSafe Jev as fallback
+# Decision layer: Laya and TypeSafe Jev in parallel, governed
 
 A reusable pattern for products that need **decisions, not sentences**: route, classify,
-triage and gate text with typed questions and calibrated probabilities, instead of
-prompting a chat LLM and parsing its prose.
+triage and gate text with typed questions and calibrated probabilities.
+
+Several models answer the same typed questions **in parallel**: Laya locally and TypeSafe
+Jev hosted. A governance layer turns their votes into one decision, `act`, `propose` or
+`review`. It inherits its rules from the CoreState manifesto (Constitution v3.1), and every
+decision records which rule fired and why. The contract is [`SPEC.md`](SPEC.md).
 
 ```
-            state + typed questions
-                     │
-                     ▼
-     ┌───────────────────────────────┐
-     │ Laya (local sidecar, ~20-60ms)│  open weights, Apache-2.0, no data leaves the machine
-     └───────────────┬───────────────┘
-      confident?     │  no / Laya down / type in always_remote
-        │ yes        ▼
-        │   ┌─────────────────────────────┐
-        │   │ Jev (TypeSafe API, ~280 ms) │  only questions with allow_remote=True
-        │   └──────────────┬──────────────┘
-        ▼                  ▼
-   answers + per-question source ("laya" | "jev") + escalated / fallback_failed
+state + questions + current FSM state
+        ├──► Laya (local, ~45 ms)  ─┐
+        └──► Jev  (hosted, ~280 ms) ─┤  concurrent; one failing never blocks the other
+                                     ▼
+          weighted combine → governance rules (§3.1 sovereignty, §3.3 heartbeat,
+          §2 FSM, §5 budget, §1.5 report the gap) → act | propose | review
+                                     ▼
+          logs/decisions.jsonl (no text) · logs/llm_calls.jsonl (tokens, cost)
 ```
 
-**Why this order.** On the same 500 labelled examples ([laya-playground benchmark][bench],
-Sept 2026) Laya matches Jev on clear-cut questions (news topic 93% vs 92%, SMS spam 96% vs
-96%) at about a sixth of the latency and no cost. Jev is clearly better on nuanced and ordinal
-questions (star rating 70% vs 35%, overall 76% vs 67%, better calibrated). So Laya takes the
-traffic and Jev catches what Laya is unsure about. The escalation rate is the number to watch:
-it is what you pay Jev latency and money on (about $0.04 per million input tokens).
-
-Both models take the same request (`state`, `questions` of type `choice` / `score` / `noul`)
-and return the same `answers` shape. One question set therefore works on both.
+**Why both.** On the same 500 labelled examples ([laya-playground benchmark][bench],
+Sept 2026), Laya matches Jev on clear-cut questions (news topic 93% vs 92%, spam 96% vs 96%)
+at about a sixth of the latency, for free. Jev is better on nuanced and ordinal questions
+(star rating 70% vs 35%; 76% vs 67% overall). When both agree, the decision is solid. When
+they disagree, a human looks. Weights per question type lean on whichever model is stronger
+for it. Both take the same request (`state`, `questions` of type `choice` / `score` / `noul`).
 
 ## Use
 
 ```bash
-pip install laya                                  # on the machine that runs the sidecar
-python -m decision_layer.sidecar                  # Laya on 127.0.0.1:8771, warmed up
-export TYPESAFE_API_KEY=...                       # optional: enables the Jev fallback
+pip install laya && python -m decision_layer.sidecar   # Laya on 127.0.0.1:8771
+cp job-crm/.env.example job-crm/.env                   # TYPESAFE_API_KEY=...
 ```
 
 ```python
-from decision_layer import DecisionClient
-from decision_layer.presets import job_email_questions, JOB_EMAIL_POLICIES
+from decision_layer.infrastructure import open_panel, load_questions
 
-client = DecisionClient.from_env()
-res = client.decide({"subject": subject, "body": body}, job_email_questions(), JOB_EMAIL_POLICIES)
-res.answers["stage"]["choice"]     # "interview"
-res.sources                        # {"stage": "laya", "needs_reply": "laya", "urgency": "jev"}
-res.fallback_failed                # escalated but no better answer: send to a human
+panel = open_panel("job-crm")        # <product>/.env, decisions/governance.json, logs/
+d = panel.decide(state, load_questions("job-crm"), {"application": "applied"})
+d.results["stage"]   # {"status": "act", "value": "interview", "probability": 0.93,
+                     #  "sources": ["jev", "laya"], "agree": True,
+                     #  "transition": {"from": "applied", "to": "interviewing"},
+                     #  "rules": {"governor": {"why": ..., "manifesto": "§2 Human as System Governor ..."}}}
 ```
 
-| Setting | Default | Effect |
+A product brings two JSON files: `decisions/questions.json` and `decisions/governance.json`.
+See [`job-crm/decisions/`](../job-crm/decisions/) for a complete example with thresholds,
+weights, a stage FSM, a budget and the recorded remote authorization.
+
+| Setting (`<product>/.env`) | Default | Effect |
 |---|---|---|
-| `LAYA_URL` | `http://127.0.0.1:8771` | Laya sidecar |
-| `LAYA_CHECKPOINT` | English | `multilingual` for non-English text (uncalibrated) |
-| `TYPESAFE_API_KEY` | unset | Unset means no fallback: weak answers are flagged, not escalated |
-| `JEV_MODEL` | `jev-latest` | Pin a Jev version for reproducible releases |
-| `DECISION_REMOTE_FALLBACK` | `1` | `0` is a kill switch: nothing goes to TypeSafe |
-| `Policy(min_confidence)` | 0.85 | Per question; set from labelled data, not by feel |
-| `Policy(allow_remote)` | `True` | `False` for questions over personal data that must stay local |
-| `always_remote` | `("score",)` | Types sent straight to Jev (Laya is weakest on ordinal scores) |
+| `TYPESAFE_API_KEY` | unset | Unset means Laya only |
+| `JEV_MODEL` | `jev-latest` | Pin a Jev version for a release |
+| `LAYA_URL` | `http://127.0.0.1:8771` | Laya sidecar (`LAYA_CHECKPOINT=multilingual` for non-English) |
+| `DECISION_REMOTE` | `1` | `0` is the kill switch: nothing leaves the machine, and each record says so |
+| `DECISION_LOG_DIR` | `logs` | Audit trail location inside the product folder |
 
-## Rules
+## Modes
 
-- **Privacy.** A fallback sends the whole `state` to a third party. Default to
-  `allow_remote=False` wherever the state holds personal data you have not cleared for that.
-- **Measure before trusting.** 50-200 real labelled examples per question set. Record accuracy
-  per backend, and the escalation rate. Tune thresholds from them. See
-  [`.claude/skills/laya-integration`](../.claude/skills/laya-integration/SKILL.md).
-- **Ask what the text says**, map to actions in code, and turn numbers into words first.
-- **Log the source**, never the text: `res.sources`, `res.escalated` and timings are the metrics.
+- **Panel** (`decision_layer.core.Panel`, the default): parallel and governed, as above.
+- **Cascade** (`decision_layer.client.DecisionClient`): Laya first, and Jev only for
+  low-confidence answers. It's cheaper, but has no governance layer. Use it where no remote
+  authorization is recorded and cost matters more than a second opinion.
+
+## Layout
+
+```
+decision_layer/core/            combine votes, governance rules, parallel panel: stdlib only, no I/O (§10)
+decision_layer/infrastructure/  .env loader, JSONL ledger, open_panel()
+decision_layer/client.py        HTTP backends (Laya sidecar, Jev) and the cascade client
+decision_layer/sidecar.py       Laya as a loopback HTTP service
+```
 
 ## Test
 
 ```bash
-cd decision-layer && python3 -m unittest discover -s tests
+cd decision-layer && python3 -m unittest discover -s tests     # 45 tests, all failure paths in SPEC §6
 ```
-
-Standard library only. `sidecar.py` is the only file that needs `laya`.
 
 Laya is by Nandakishor M, Convai Innovations ([Apache-2.0](https://github.com/NandhaKishorM/laya)).
 The integration skill is by [brain function collapse](https://brainfunctioncollapse.com/laya).

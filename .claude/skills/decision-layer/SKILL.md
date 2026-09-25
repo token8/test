@@ -1,28 +1,32 @@
 ---
 name: decision-layer
-description: House pattern for typed decisions in any project or product - Laya running locally as the primary model, TypeSafe Jev as the hosted fallback. Use whenever a feature classifies, routes, triages, scores or gates text (emails, tickets, job posts, leads, agent guardrails), or when the user mentions Laya, Jev, TypeSafe, typed decisions or the decision layer. Prefer it over prompting a chat LLM for a label.
+description: House pattern for typed decisions in any project or product - Laya (local) and TypeSafe Jev (hosted) answer the same typed questions in parallel, and a governance layer inheriting the CoreState manifesto turns their votes into act / propose / review. Use whenever a feature classifies, routes, triages, scores or gates text (emails, tickets, job posts, leads, agent guardrails), or when the user mentions Laya, Jev, TypeSafe, typed decisions, the decision panel or the decision layer. Prefer it over prompting a chat LLM for a label.
 ---
 
-# Decision layer (Laya → Jev)
+# Decision layer (governed parallel panel)
 
-The reference implementation is `decision-layer/` in the `token8/test` repo. Copy or vendor
-`decision_layer/` (standard library only), or reimplement `DecisionClient.decide` in the
-project's language, with the same order of steps:
+The reference implementation is `decision-layer/` in the `token8/test` repo, and its contract
+is `decision-layer/SPEC.md`. Read the spec before changing behaviour. Spec → Test → Code (§9).
 
-1. Ask Laya (loopback sidecar) all questions in **one** call.
-2. Escalate a question when Laya failed, its top probability is below the question's
-   `min_confidence`, or its type is in `always_remote` (default: `score`).
-3. Send only escalated questions with `allow_remote=True` to Jev (`POST
-   https://api.typesafe.ai/v1/systemone`, `Authorization: Bearer $TYPESAFE_API_KEY`, body
-   `{state, model, questions}`), with short retries on 429/5xx.
-4. Return answers plus, per question, the source (`laya`/`jev`), and list the escalated
-   questions and the ones no backend could answer confidently (these go to a human).
+Adding decisions to a product:
 
-Before shipping a feature that uses it:
+1. Create `<product>/decisions/questions.json`. Write the questions per
+   `.claude/skills/laya-integration/SKILL.md`: ask what the text says, describe every
+   option, and turn numbers into words.
+2. Create `<product>/decisions/governance.json`: copy `job-crm/decisions/governance.json`,
+   then set `inherits`, thresholds, weights (score questions lean on Jev), an FSM for any
+   answer that changes state, and `approval_required` for terminal or costly states.
+3. Remote calls need a `remote_authorization` block (who, when, scope) (§3.1). Without it,
+   everything stays local by design. Mark sensitive questions `"remote": false`.
+4. Put secrets in `<product>/.env`, git-ignored (§11). Commit `.env.example` only.
+5. Wire in `open_panel(<product>)` and `panel.decide(state, questions, context)`: apply `act`,
+   queue `propose` for y/N, and queue `review` for a human answer.
 
-- [ ] Questions written per `.claude/skills/laya-integration/SKILL.md` (ask what the text says; described options; numbers turned into words)
-- [ ] Privacy decided per question: `allow_remote=False` for personal data not cleared for TypeSafe; `DECISION_REMOTE_FALLBACK=0` kill switch wired
-- [ ] 50-200 labelled real examples; accuracy per backend, escalation rate and p50/p95 latency recorded in the release notes
-- [ ] Thresholds chosen from that data; low-confidence path goes to a person or a review queue
-- [ ] `JEV_MODEL` pinned for the release; sidecar health check in the app's startup/monitoring
-- [ ] Metrics logged without the text: sources, escalations, timings, Jev input tokens
+Before shipping:
+
+- [ ] Failure paths tested: local down, remote down, both down, kill switch, budget, illegal transition
+- [ ] 50-200 labelled real examples: accuracy per backend and for the panel, act/propose/review share, p50/p95, monthly cost
+- [ ] Thresholds and weights set from that data; `governance.json` version bumped
+- [ ] `JEV_MODEL` pinned; sidecar health check monitored; kill switch drill done
+- [ ] Logs carry no message text (state hash only); cost logged per remote call (§5)
+- [ ] Repo visibility checked: personal data, `.env` and `logs/` never committed
