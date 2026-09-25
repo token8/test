@@ -52,6 +52,7 @@ class Governance:
         self.authorization = policy.get("remote_authorization")
         self.budget = policy.get("budget", {})
         self.fsm = policy.get("fsm", {})
+        self.optional = set(policy.get("optional_backends", []))     # missing these is not degraded
         for qid in policy["questions"]:
             cfg = self.question(qid)
             if cfg["autonomy"] not in ("act", "propose"):
@@ -89,6 +90,7 @@ class Governance:
 
         c = combine(votes, self.weights(qtype))
         threshold = cfg["act_threshold"]
+        degraded = [name for name in degraded if name not in self.optional]
         if degraded:
             threshold = max(threshold, cfg["degraded_threshold"])
             fire("failure", "act", "%s missing; threshold raised to %.2f" % (", ".join(sorted(degraded)), threshold))

@@ -196,6 +196,19 @@ class PanelTest(unittest.TestCase):
         self.assertIn("failure", d.rules("stage"))
         self.assertFalse(d.record["backends"]["laya"]["ok"])
 
+    def test_fp1_optional_local_down_keeps_normal_threshold(self):
+        pol = dict(POLICY, optional_backends=["laya"])
+        d = panel(Fake("laya", fail=True), Fake("jev", AGREE, remote=True), policy=pol).decide("s", QS, {"application": "applied"})
+        self.assertEqual(d.status("stage"), "act")                 # 0.90 >= normal 0.80, not degraded 0.95
+        self.assertEqual(d.results["stage"]["sources"], ["jev"])
+        self.assertNotIn("failure", d.rules("stage"))
+        self.assertFalse(d.record["backends"]["laya"]["ok"])       # still visible in the audit record
+
+    def test_optional_backend_not_listed_is_still_degraded(self):
+        pol = dict(POLICY, optional_backends=["jev"])
+        d = panel(Fake("laya", fail=True), Fake("jev", AGREE, remote=True), policy=pol).decide("s", QS, {"application": "applied"})
+        self.assertIn("failure", d.rules("stage"))
+
     def test_fp2_remote_down(self):
         d = panel(Fake("laya", AGREE), Fake("jev", remote=True, fail=True)).decide("s", QS, {"application": "applied"})
         self.assertEqual(d.results["stage"]["sources"], ["laya"])

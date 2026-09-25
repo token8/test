@@ -66,6 +66,19 @@ weights, a stage FSM, a budget and the recorded remote authorization.
 | `DECISION_REMOTE` | `1` | `0` is the kill switch: nothing leaves the machine, and each record says so |
 | `DECISION_LOG_DIR` | `logs` | Audit trail location inside the product folder |
 
+## Optional backends and token usage
+
+`"optional_backends": ["laya"]` in `governance.json` means a missing Laya is normal operation: Jev
+decides alone at the normal threshold, and the record still shows Laya as unavailable. Without
+it, a missing backend raises the bar to `degraded_threshold`.
+
+```bash
+python -m decision_layer.infrastructure.usage <product>                  # today, month to date, spike check
+python -m decision_layer.infrastructure.usage <product> --fail-on-spike  # exit 1 on a spike, for scheduled runs
+```
+
+A spike is a day at 3× or more the median of the previous 7 days, and at least 20,000 input tokens.
+
 ## Modes
 
 - **Panel** (`decision_layer.core.Panel`, the default): parallel and governed, as above.
@@ -97,7 +110,7 @@ docker/                         laya-serve container: loopback, read-only, non-r
 ## Test
 
 ```bash
-cd decision-layer && python3 -m unittest discover -s tests     # 52 tests, all failure paths in SPEC §6
+cd decision-layer && python3 -m unittest discover -s tests     # 62 tests, all failure paths in SPEC §6
 # the 3 laya-serve contract tests run when laya[serve] is installed, and skip otherwise
 ```
 

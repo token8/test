@@ -48,7 +48,7 @@ Precedence: `review` > `propose` > `act`. The strictest status that any rule tri
 | `sovereignty` | §3.1 Law of Sovereignty | Remote backends get a question only if `remote_authorization` is recorded in the governance file and the question has `remote: true`. Otherwise the question stays local, by design (not degraded). |
 | `economy` | §5 Model Routing | Every remote call is logged with tokens and cost. At or above `budget.monthly_usd_ceiling` for the month, remote calls stop (degraded). |
 | `kill_switch` | §3, §15 residual | `DECISION_REMOTE=0` stops all remote calls. Each decision record says so, so the switch leaves an auditable trace. |
-| `failure` | §2 Testing the Abyss | Degraded mode: an expected backend failed or was blocked. The threshold rises to `degraded_threshold`. |
+| `failure` | §2 Testing the Abyss | Degraded mode: an expected backend failed or was blocked. The threshold rises to `degraded_threshold`. A backend listed in `optional_backends` doesn't count: without it, the others decide at the normal threshold. The record still shows it as unavailable. |
 | `gap` | §1.5 Report the Gap | Backends disagree (when `require_agreement`), or combined confidence is below the threshold → `review`. |
 | `state` | §2 State is Sovereign | An answer mapped to an FSM state must be a legal transition from the current state (`context[fsm]`, default `(none)`). Illegal → `review`. Same state → no transition. |
 | `heartbeat` | §3.3 Law of the Heartbeat | A transition into an `approval_required` state, or a question with `autonomy: propose` → `propose`. |
@@ -69,7 +69,8 @@ Precedence: `review` > `propose` > `act`. The strictest status that any rule tri
 
 ## 6. Failure paths (all tested)
 
-1. Local down, remote up → remote answers alone, degraded threshold.
+1. Local down, remote up → remote answers alone, degraded threshold. If the local backend is in
+   `optional_backends`, the normal threshold applies instead (tested both ways).
 2. Remote down (error, timeout, 5xx after retries) → local alone, degraded threshold.
 3. Both down → every question `review` with reason `no backend answered`. The call never
    raises: the review queue is the failure path.
@@ -95,6 +96,10 @@ interfaces. `decision_layer/infrastructure/` holds the HTTP backends, the `.env`
 JSONL ledger and the Laya sidecar.
 
 ## 9. Decisions log
+
+- 2026-09-25: `optional_backends` added. The job CRM runs on Jev alone while Laya isn't running,
+  at its normal threshold, until token usage spikes. `infrastructure/usage.py` reports daily
+  remote tokens and cost from `llm_calls.jsonl`, and flags spikes against the trailing days.
 
 - 2026-09-25: The owner authorized sending job-search decision questions to TypeSafe Jev,
   in parallel with Laya (not only as a fallback). This is recorded in that product's own (private) `decisions/governance.json`;
